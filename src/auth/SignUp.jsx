@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react"; // for password toggle icons
+import { Navigate } from "react-router-dom";
 
 export default function Signup() {
   const [loading, setLoading] = useState(false);
@@ -14,8 +15,8 @@ export default function Signup() {
     const form = new FormData(e.target);
 
     try {
-      await signup(form);         // calls signupUser -> API
-      navigate("/dashboard");
+      await Signup(form);         // calls signupUser -> API
+      Navigate("/dashboard");
     } catch (err) {
       setError(err.message || "Signup failed");
     } finally {
