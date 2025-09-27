@@ -27,6 +27,7 @@ export default function Login() {
   // };
 
   return (
+    <>
     <div className="min-h-screen flex flex-col lg:flex-row bg-white font-poppins">
       {/* Left Section (Form) */}
       <div className="w-1/2 overflow-y-auto p-8 flex flex-col mt-14 space-y-3">
@@ -84,5 +85,6 @@ export default function Login() {
         </div>
       </div>
     </div>
+    </>
   );
 }
