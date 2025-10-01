@@ -4,11 +4,11 @@ import { IoEye } from "react-icons/io5";
 import { TiWarning } from "react-icons/ti";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import MainLogo from "@/assets/images/HandyLogo.png";
-import LoginImage from "@/assets/images/loginRight.png";
-import Apple from "@/assets/images/apple.png"
-import FacebookIcon from "@/assets/images/facebook.png";
-import GoogleIcon from "@/assets/images/google.png";
+import MainLogo from "../assets/images/HandyLogo.png";
+import LoginImage from "../assets/images/loginRight.png";
+import Apple from "../assets/images/apple.png"
+import FacebookIcon from "../assets/images/facebook.png";
+import GoogleIcon from "../assets/images/google.png";
 import { loginSchema, signupSchema } from "../utils/validation";
 
 export default function Login() {
