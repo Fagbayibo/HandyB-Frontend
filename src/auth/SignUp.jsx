@@ -300,7 +300,7 @@ export default function Signup() {
       </div>
 
       {/* Right */}
-      <div className="w-1/2 hidden md:block">
+      <div className="w-1/2 hidden lg:block md:hidden">
         <div className="sticky top-0 h-screen">
           <img
             src={LoginImage}
