@@ -1,8 +1,8 @@
-import LoginImage from "../assets/images/LogRight.png";
-import MainLogo from "../assets/images/HandyLogo.png";
-import GoogleIcon from "../assets/images/google.png";
-import AppleIcon from "../assets/images/apple.png";
-import FacebookIcon from "../assets/images/facebook.png";
+import LoginImage from "@/assets/images/LogRight.png";
+import MainLogo from "@/assets/images/HandyLogo.png";
+import GoogleIcon from "@/assets/images/google.png";
+import AppleIcon from "@/assets/images/apple.png";
+import FacebookIcon from "@/assets/images/facebook.png";
 import { useState } from "react";
 import { signupSchema } from "../utils/validation";
 import PhoneInput from "react-phone-number-input";
