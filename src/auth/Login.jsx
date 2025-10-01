@@ -6,7 +6,7 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import MainLogo from "../assets/images/HandyLogo.png";
 import LoginImage from "../assets/images/loginRight.png";
-import AppleIcon from "../assets/images/apple.png";
+import Apple from "../assets/images/apple.png"
 import FacebookIcon from "../assets/images/facebook.png";
 import GoogleIcon from "../assets/images/google.png";
 import { loginSchema, signupSchema } from "../utils/validation";
@@ -84,7 +84,7 @@ export default function Login() {
                 />
               </div>
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center cursor-pointer">
-                <img src={AppleIcon} alt="apple icon" className="w-5 sm:w-6" />
+                <img src={Apple} alt="apple icon" className="w-5 sm:w-6" />
               </div>
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center cursor-pointer">
                 <img
