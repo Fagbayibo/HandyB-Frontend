@@ -306,6 +306,7 @@ export default function Signup() {
             src={LoginImage}
             className="w-full h-full object-cover"
             alt="Login background"
+            loading="lazy"
           />
         </div>
       </div>

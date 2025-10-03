@@ -22,7 +22,7 @@ export default function Login() {
 
   const isFormValid = phone && password;
   const { login } = useAuth();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +34,7 @@ export default function Login() {
 
       setLoading(true);
       const userData = await login(formData);
-      navigate("/dashboard")
+      navigate("/dashboard");
       console.log("User loggedin: ", userData);
     } catch (err) {
       if (err.inner) {
@@ -43,8 +43,8 @@ export default function Login() {
           return acc;
         }, {});
         setError(errors);
-      }else {
-        setError({general: err.message || "login failed"})
+      } else {
+        setError({ general: err.message || "login failed" });
       }
     }
   };
@@ -199,10 +199,9 @@ export default function Login() {
           </form>
 
           <div className="w-full text-center">
-            <button className="text-sm sm:text-md tracking-tight text-center my-6 sm:my-8">
+            <button className="text-sm sm:text-md tracking-tight text-center my-6 sm:my-8 gap-3">
               Don't have an account?
-              <a href="#" className="underline font-semibold text-brand">
-                {" "}
+              <a href="/signup" className="underline font-semibold text-brand">
                 Sign Up
               </a>
             </button>
@@ -217,6 +216,7 @@ export default function Login() {
             src={LoginImage}
             className="w-full h-full object-cover"
             alt="Login background"
+            loading="lazy"
           />
         </div>
       </div>

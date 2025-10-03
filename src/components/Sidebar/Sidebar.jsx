@@ -5,8 +5,11 @@ import Bookings from "../../assets/icons/Bookings.png";
 import Chat from "../../assets/icons/Chat.png";
 import Payment from "../../assets/icons/Payment.png";
 import Logo from "../../assets/images/White.png";
+import { IoMdLogOut } from "react-icons/io";
+import { useAuth } from "../../context/AuthContext";
 
 const Sidebar = () => {
+  const {logout} = useAuth()
   const sidebarLinks = [
     { id: 1, name: "Dashboard", path: "/dashboard", icon: Dashboard },
     { id: 2, name: "Services", path: "/dashboard/services", icon: ServicesIcon },
@@ -50,8 +53,8 @@ const Sidebar = () => {
         </div>
 
         {/* Logout Button at the Bottom */}
-        <button className="flex items-center gap-3 px-3 py-3 text-white font-mona hover:bg-white/10 hover:translate-x-2 transition-transform duration-400 ease-in-out rounded">
-          Logout
+        <button onClick={() => logout()} className="cursor-pointer flex items-center gap-3 px-3 py-3 text-white font-mona hover:bg-white/10 hover:translate-x-2 transition-transform duration-400 ease-in-out rounded">
+         <IoMdLogOut size={30}/> Logout
         </button>
       </div>
     </div>
