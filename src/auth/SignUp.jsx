@@ -110,17 +110,10 @@ export default function Signup() {
             className="flex flex-col space-y-6 sm:space-y-8"
           >
             {/* Full Name */}
-            <div className="flex flex-col space-y-2 w-full">
-              <div className="flex justify-between">
-                <label className="font-medium tracking-tight text-md">
-                  Full Name
-                </label>
-                {error.fullName && (
-                  <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm">
-                    <TiWarning size={18} /> {error.fullName}
-                  </p>
-                )}
-              </div>
+            <div className="flex flex-col space-y-1 w-full">
+              <label className="font-medium tracking-tight text-md">
+                Full Name
+              </label>
               <input
                 value={fullName}
                 onChange={(e) => {
@@ -137,20 +130,18 @@ export default function Signup() {
                   }
                 `}
               />
+              {error.fullName && (
+                <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
+                  <TiWarning size={18} /> {error.fullName}
+                </p>
+              )}
             </div>
 
             {/* Email */}
-            <div className="flex flex-col space-y-2 w-full">
-              <div className="flex justify-between">
-                <label className="font-medium tracking-tight text-md">
-                  Email Address
-                </label>
-                {error.email && (
-                  <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm">
-                    <TiWarning size={18} /> {error.email}
-                  </p>
-                )}
-              </div>
+            <div className="flex flex-col space-y-1 w-full">
+              <label className="font-medium tracking-tight text-md">
+                Email Address
+              </label>
               <input
                 value={email}
                 onChange={(e) => {
@@ -167,20 +158,18 @@ export default function Signup() {
                   }
                 `}
               />
+              {error.email && (
+                <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
+                  <TiWarning size={18} /> {error.email}
+                </p>
+              )}
             </div>
 
             {/* Phone */}
-            <div className="flex flex-col space-y-2 w-full">
-              <div className="flex justify-between">
-                <label className="font-medium tracking-tight text-md">
-                  Phone number
-                </label>
-                {error.phone && (
-                  <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm">
-                    <TiWarning size={18} /> {error.phone}
-                  </p>
-                )}
-              </div>
+            <div className="flex flex-col space-y-1 w-full">
+              <label className="font-medium tracking-tight text-md">
+                Phone number
+              </label>
               <PhoneInput
                 placeholder="Enter your phone number"
                 defaultCountry="US"
@@ -193,47 +182,52 @@ export default function Signup() {
                   ${error.phone ? "border-red-500" : "border-inputborder"}
                 `}
               />
+              {error.phone && (
+                <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
+                  <TiWarning size={18} /> {error.phone}
+                </p>
+              )}
             </div>
 
             {/* Password */}
-            <div className="flex flex-col space-y-2 w-full relative">
-              <div className="flex justify-between">
-                <label className="font-medium tracking-tight text-md">
-                  Password
-                </label>
-                {error.password && (
-                  <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm">
-                    <TiWarning size={18} /> {error.password}
-                  </p>
-                )}
+            <div className="flex flex-col space-y-1 w-full">
+              <label className="font-medium tracking-tight text-md">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    validateField("password", e.target.value);
+                  }}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  className={`h-12 w-full rounded-xl border text-sm sm:text-base pl-6 pr-10 text-gray-700 placeholder-gray-400 outline-none transition
+                    ${
+                      error.password
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-200"
+                        : "border-inputborder focus:border-blue-500 focus:ring-blue-200"
+                    }
+                  `}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                >
+                  {showPassword ? (
+                    <IoEye size={20} className="text-gray-600" />
+                  ) : (
+                    <IoMdEyeOff size={20} className="text-gray-600" />
+                  )}
+                </button>
               </div>
-              <input
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  validateField("password", e.target.value);
-                }}
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                className={`h-12 w-full rounded-xl border text-sm sm:text-base pl-6 pr-10 text-gray-700 placeholder-gray-400 outline-none transition
-                  ${
-                    error.password
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-200"
-                      : "border-inputborder focus:border-blue-500 focus:ring-blue-200"
-                  }
-                `}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-6 bottom-5 cursor-pointer"
-              >
-                {showPassword ? (
-                  <IoEye size={20} className="text-gray-600" />
-                ) : (
-                  <IoMdEyeOff size={20} className="text-gray-600" />
-                )}
-              </button>
+              {error.password && (
+                <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
+                  <TiWarning size={18} /> {error.password}
+                </p>
+              )}
             </div>
 
             {/* Terms */}
