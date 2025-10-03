@@ -1,6 +1,6 @@
 // import api from "./api.js";
 
-export async function loginRequest({email, password}) {
+export async function loginRequest({phone, password}) {
   // When using real backend:
   // const { data } = await api.post("/auth/login", { email, password });
   // return data;
@@ -11,7 +11,7 @@ export async function loginRequest({email, password}) {
       const user = {
         id: Date.now(),
         name: "DemoUser",
-        email,
+        phone,
         password,
         token: "demo.jwt.token",
       };

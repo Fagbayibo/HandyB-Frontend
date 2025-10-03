@@ -6,10 +6,12 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import MainLogo from "../assets/images/HandyLogo.png";
 import LoginImage from "../assets/images/loginRight.png";
-import Apple from "../assets/images/apple.png"
+import Apple from "../assets/images/apple.png";
 import FacebookIcon from "../assets/images/facebook.png";
 import GoogleIcon from "../assets/images/google.png";
 import { loginSchema, signupSchema } from "../utils/validation";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router";
 
 export default function Login() {
   const [phone, setPhone] = useState("");
@@ -19,6 +21,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const isFormValid = phone && password;
+  const { login } = useAuth();
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,7 +31,11 @@ export default function Login() {
     try {
       await loginSchema.validate(formData, { abortEarly: false });
       setError({});
-      console.log("Submitted Data: ", formData);
+
+      setLoading(true);
+      const userData = await login(formData);
+      navigate("/dashboard")
+      console.log("User loggedin: ", userData);
     } catch (err) {
       if (err.inner) {
         const errors = err.inner.reduce((acc, curr) => {
@@ -35,6 +43,8 @@ export default function Login() {
           return acc;
         }, {});
         setError(errors);
+      }else {
+        setError({general: err.message || "login failed"})
       }
     }
   };
@@ -63,10 +73,10 @@ export default function Login() {
           {/* Header */}
           <div className="space-y-2 mt-6 text-center">
             <h2 className="text-2xl sm:text-[28px] font-medium tracking-tighter">
-             Welcome Back
+              Welcome Back
             </h2>
             <p className="tracking-tight text-sm sm:text-[16px] px-4 sm:px-12 lg:px-[120px]">
-             Log in to book services, track rewards, and manage your bookings.
+              Log in to book services, track rewards, and manage your bookings.
             </p>
           </div>
 
@@ -170,8 +180,6 @@ export default function Login() {
               </button>
             </div>
 
-       
-
             {/* Submit */}
             <div>
               <button
@@ -192,7 +200,7 @@ export default function Login() {
 
           <div className="w-full text-center">
             <button className="text-sm sm:text-md tracking-tight text-center my-6 sm:my-8">
-             Don't have an account?
+              Don't have an account?
               <a href="#" className="underline font-semibold text-brand">
                 {" "}
                 Sign Up

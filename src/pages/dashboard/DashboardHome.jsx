@@ -1,11 +1,8 @@
-import { Dashboard } from "../../components/Dashboard/Dashboard";
-import { sidebar } from "../../components/Sidebar/sidebar";
-
-export default function Home() {
+import DashboardLayout from "../../layouts/DashboardLayout"
+const DashboardHome = () => {
   return (
-    <main className="">
-      <Sidebar />
-      <Dashboard />
-    </main>
+    <DashboardLayout/>
   )
 }
+
+export default DashboardHome

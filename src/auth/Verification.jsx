@@ -6,7 +6,7 @@ import { Commet } from "react-loading-indicators";
 
 const VerificationPage = () => {
   const [loading, setLoading] = useState(false);
-  const [dots, setDots] = useState("")
+  const [dots, setDots] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,16 +14,16 @@ const VerificationPage = () => {
       setLoading(true);
 
       const redirect = setTimeout(() => {
-        navigate("/verify");
+        navigate("/dashboard");
       }, 2000);
 
       return () => clearTimeout(redirect);
-    }, 4000);
+    }, 2000);
 
     return () => clearTimeout(showLoading);
   }, [navigate]);
 
-   useEffect(() => {
+  useEffect(() => {
     if (!loading) return;
     const interval = setInterval(() => {
       setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
@@ -57,7 +57,7 @@ const VerificationPage = () => {
 
         {/* Loading State */}
 
-       {/* Loading State */}
+        {/* Loading State */}
         <div className="mt-6 flex flex-col items-center gap-2">
           {loading ? (
             <>
@@ -67,7 +67,7 @@ const VerificationPage = () => {
               </p>
             </>
           ) : (
-            <p className="text-sm text-gray-600 font-medium">
+            <p className="text-md italic text-black tracking-tight font-medium">
               Preparing your account...
             </p>
           )}

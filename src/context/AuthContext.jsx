@@ -1,41 +1,42 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { loginRequest, signupRequest } from "../services/authApi.js";
 
-// 1. Create the context
 const AuthContext = createContext(null);
 
-// 2. Create the provider
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);          // user object
+  const [loading, setLoading] = useState(false);   // API request loading
+  const [initializing, setInitializing] = useState(true); // for refresh handling
 
-  // 3. On mount, check for saved token
+  // On mount, check for saved token
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (token) {
-      setUser({ token }); // Optional: fetch user profile here
+      // Optionally, you can fetch the user profile here from API
+      setUser({ token });
     }
+    setInitializing(false); // finished initializing
   }, []);
 
-  // 4. Login function
+  // Login function
   const login = async (credentials) => {
     setLoading(true);
     try {
-      const data = await loginRequest(credentials);
+      const data = await loginRequest(credentials); // API call
       localStorage.setItem("authToken", data.token); // save token
-      setUser(data);
+      setUser(data); // set user data
       return data;
     } finally {
       setLoading(false);
     }
   };
 
-  // 5. Signup function
+  // Signup function
   const signup = async (payload) => {
     setLoading(true);
     try {
       const data = await signupRequest(payload);
-      localStorage.setItem("authToken", data.token); // save token
+      localStorage.setItem("authToken", data.token);
       setUser(data);
       return data;
     } finally {
@@ -43,21 +44,22 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // 6. Logout function
+  // Logout function
   const logout = () => {
     setUser(null);
     localStorage.removeItem("authToken");
   };
 
-  // 7. Provide everything to children
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, initializing, login, signup, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-// 8. Custom hook to use the auth context
+// Custom hook
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
