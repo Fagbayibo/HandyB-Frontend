@@ -1,58 +1,85 @@
-import React from "react";
-import { CheckBadgeIcon, ArrowPathIcon } from "@heroicons/react/24/solid"; // Icons
+import { useEffect, useState } from "react";
+import SentIcon from "../assets/icons/Verified.png";
+import Verified from "../assets/images/PasswordBG.png";
+import { useNavigate } from "react-router";
+import { Commet } from "react-loading-indicators";
 
 const VerificationPage = () => {
+  const [loading, setLoading] = useState(false);
+  const [dots, setDots] = useState("")
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const showLoading = setTimeout(() => {
+      setLoading(true);
+
+      const redirect = setTimeout(() => {
+        navigate("/verify");
+      }, 2000);
+
+      return () => clearTimeout(redirect);
+    }, 4000);
+
+    return () => clearTimeout(showLoading);
+  }, [navigate]);
+
+   useEffect(() => {
+    if (!loading) return;
+    const interval = setInterval(() => {
+      setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
+    }, 500); // change every half second
+
+    return () => clearInterval(interval);
+  }, [loading]);
+
   return (
-    <div className="relative min-h-screen w-full bg-white font-poppins flex items-center justify-center px-4 overflow-hidden">
-      {/* Pattern background */}
+    <div className="min-h-screen w-full relative flex items-center justify-center px-4 md:px-0">
+      {/* Background */}
       <div
-        className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[900px] h-[900px] opacity-10 pointer-events-none"
-        style={{
-          backgroundImage: "url('/pattern.svg')",
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-        }}
+        style={{ backgroundImage: `url(${Verified})` }}
+        className="absolute -z-10 inset-0 bg-cover bg-center"
       ></div>
 
-      {/* Main Card */}
-      <div className="relative w-full max-w-3xl bg-white rounded-xl flex flex-col items-center text-center px-6 py-10 md:px-12">
+      {/* Main Content */}
+      <div className="container flex flex-col items-center py-10 space-y-3 bg-white w-full max-w-[1200px]">
         {/* Icon */}
-        <div className="w-16 h-16 rounded-full bg-[#F9F9FF] flex items-center justify-center">
-          <CheckBadgeIcon className="w-10 h-10 text-[#253CFE]" />
+        <img src={SentIcon} className="w-20 md:w-20" alt="Sent Icon" />
+
+        {/* Text */}
+        <div className="text-center space-y-2 px-4  md:px-[220px]">
+          <p className="font-semibold text-2xl tracking-tight md:text-2xl">
+            Account is Verified!
+          </p>
+          <p className="md:max-lg:text-black-500 font-medium tracking-tight text-[14px] md:text-[18px] text-gray-700">
+            You account has been verified. You're all set to book services.
+          </p>
         </div>
 
-        {/* Heading */}
-        <h2 className="mt-6 text-xl md:text-2xl font-semibold text-black">
-          Account Verified!
-        </h2>
+        {/* Loading State */}
 
-        {/* Description */}
-        <p className="mt-4 text-sm md:text-lg text-gray-800 leading-relaxed max-w-xl">
-          Your account has been successfully verified. You're all set to{" "}
-          <span className="font-semibold">explore and book services</span>.
-        </p>
+       {/* Loading State */}
+        <div className="mt-6 flex flex-col items-center gap-2">
+          {loading ? (
+            <>
+              <Commet size="small" color="#253CFE" />
+              <p className="text-md italic text-black tracking-tight font-medium">
+                Redirecting you to your dashboard{dots}
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-gray-600 font-medium">
+              Preparing your account...
+            </p>
+          )}
+        </div>
 
-        {/* Loading Spinner + Text */}
-        <div className="flex items-center justify-center mt-8 space-x-2">
-          <ArrowPathIcon
-            className="w-5 h-5 text-[#253CFE] animate-spin"
-            style={{ animationDuration: "1s" }}
-          />
-          <span className="text-xs md:text-sm text-gray-700 italic">
-            Loading your dashboard, just a moment...
+        {/* Experience Problem
+        <div className="text-center mt-12 mb-4 text-sm text-gray-400">
+          Experiencing any problems?{" "}
+          <span className="underline font-semibold text-black cursor-pointer">
+            Contact Us
           </span>
-        </div>
-
-        {/* Footer Help Text */}
-        <p className="mt-10 text-xs md:text-sm text-gray-500">
-          Having trouble?{" "}
-          <a
-            href="mailto:support@example.com"
-            className="font-bold underline text-gray-700 hover:opacity-80"
-          >
-            Contact us
-          </a>
-        </p>
+        </div> */}
       </div>
     </div>
   );

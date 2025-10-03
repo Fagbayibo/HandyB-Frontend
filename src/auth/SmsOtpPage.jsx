@@ -1,14 +1,22 @@
-import React, { useState, useRef } from "react";
-import { RefreshCw, Phone, Send } from "lucide-react"; // using lucide-react icons
+import PasswordBG from "../assets/images/PasswordBG.png";
+import SentIcon from "../assets/icons/Sent.png";
+import { useEffect, useRef, useState } from "react";
+import { TbRefresh } from "react-icons/tb";
+import { BiLogoGmail } from "react-icons/bi";
+import { useNavigate } from "react-router";
 
-const SMSOtpPage = () => {
-  const [otp, setOtp] = useState(["", "", "", "", ""]); // empty by default
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+
+const SmsOtpPage = () => {
+  const [otp, setOtp] = useState(["", "", "", "", ""]);
   const inputsRef = useRef([]);
+  const [isValid, setIsValid] = useState(null);
+  const navigate = useNavigate()
+
+  const correctOtp = ["1", "2", "3", "4", "5"];
 
   const handleChange = (element, index) => {
-    if (!/^\d*$/.test(element.value)) return;
+    if (index > 0 && otp[index - 1] === "") return;
+    if (!/^\d*$/.test(element.value.trim())) return;
 
     const newOtp = [...otp];
     newOtp[index] = element.value;
@@ -17,65 +25,62 @@ const SMSOtpPage = () => {
     if (element.value && index < otp.length - 1) {
       inputsRef.current[index + 1].focus();
     }
-  };
 
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      const newOtp = [...otp];
-      newOtp[index - 1] = "";
-      setOtp(newOtp);
-      inputsRef.current[index - 1].focus();
-      e.preventDefault();
+    if (newOtp.every((val) => val !== "")) {
+      const correct = newOtp.join("") === correctOtp.join("");
+      setIsValid(correct);
+      if (correct) {
+        setIsValid(true)
+        setTimeout(() => navigate("/verify"), 1000)
+      }
+    } else {
+      setIsValid(null);
     }
   };
 
-  const handleResend = () => {
-    setMessage("🔄 OTP has been resent via SMS!");
-    setError("");
-    setOtp(["", "", "", "", ""]);
-    inputsRef.current[0]?.focus();
+  const handleKeyDown = (e, index) => {
+    const newOtp = [...otp];
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      if (otp[index]) {
+        newOtp[index] = "";
+        setOtp(newOtp);
+      } else if (index > 0) {
+        newOtp[index - 1] = "";
+        setOtp(newOtp);
+        inputsRef.current[index - 1].focus();
+      }
+      setIsValid(null);
+    }
   };
 
-  const handleSendEmail = () => {
-    setMessage("📧 OTP will be sent via Email!");
-    setError("");
-    setOtp(["", "", "", "", ""]);
-    inputsRef.current[0]?.focus();
-  };
 
   return (
-    <div className="relative min-h-screen w-full bg-white font-poppins flex items-center justify-center px-4 overflow-hidden">
-      {/* Pattern background */}
+    <div className="min-h-screen w-full relative flex items-center justify-center px-4 md:px-0">
+      {/* Background */}
       <div
-        className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[900px] h-[900px] opacity-10 pointer-events-none"
-        style={{
-          backgroundImage: "url('/pattern.svg')",
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-        }}
+        style={{ backgroundImage: `url(${PasswordBG})` }}
+        className="absolute -z-10 inset-0 bg-cover bg-center"
       ></div>
 
-      {/* Main Card */}
-      <div className="relative w-full max-w-3xl bg-white rounded-xl flex flex-col items-center text-center px-6 py-10 md:px-12">
+      {/* Main Content */}
+      <div className="container flex flex-col items-center py-10 space-y-3 bg-white w-full max-w-[1200px]">
         {/* Icon */}
-        <div className="w-16 h-16 rounded-full bg-[#F9F9F9] flex items-center justify-center">
-          <Phone size={36} className="text-black" />
+        <img src={SentIcon} className="w-20 md:w-20" alt="Sent Icon" />
+
+        {/* Text */}
+        <div className="text-center space-y-2 px-4  md:px-[220px]">
+          <p className="font-semibold text-2xl tracking-tight md:text-2xl">
+            Confirmation OTP Sent!
+          </p>
+          <p className="md:max-lg:text-blue-500 tracking-tight text-[14px] md:text-[18px] text-gray-700">
+            We’ve sent a <span className="font-semibold">Verification OTP</span> to{" "}
+            <span className="font-semibold">(+91-233-345632)</span>. Please check your inbox and fill the boxes to confirm your account.
+          </p>
         </div>
 
-        {/* Heading */}
-        <h2 className="mt-6 text-xl md:text-2xl font-semibold text-black">
-          SMS OTP Verification
-        </h2>
-
-        {/* Description */}
-        <p className="mt-4 text-sm md:text-lg text-gray-800 leading-relaxed max-w-xl">
-          We've sent a <span className="font-bold">Verification OTP</span> to{" "}
-          <span className="font-semibold">(+91-356-464-2465)</span>. Please
-          check your SMS inbox and fill the boxes below to confirm your account.
-        </p>
-
         {/* OTP Inputs */}
-        <div className="flex justify-center gap-3 md:gap-4 mt-8 flex-wrap">
+        <div className="flex flex-wrap justify-center gap-3 md:gap-4 mt-4">
           {otp.map((value, index) => (
             <input
               key={index}
@@ -87,48 +92,39 @@ const SMSOtpPage = () => {
               ref={(el) => (inputsRef.current[index] = el)}
               autoComplete="off"
               inputMode="numeric"
-              className="w-12 h-12 md:w-14 md:h-14 text-center text-xl md:text-2xl font-semibold rounded-lg outline-none border-2 border-gray-400 text-black focus:border-[#253CFE] transition"
+              className={`w-12 h-12 md:w-14 md:h-14 text-center text-xl md:text-2xl font-semibold rounded-xl outline-none
+                border-3 transition-all ${
+                  isValid === false
+                    ? "border-red-500 text-red-500 shake"
+                    : otp.every((val) => val !== "") && isValid === true
+                    ? "border-green-500 text-green-500"
+                    : value
+                    ? "border-gradient-brand text-brand"
+                    : "border-gray-400"
+                }`}
+              style={{ borderImageSlice: 1 }}
             />
           ))}
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-6 mt-8 text-blue-600 text-sm md:text-base font-medium">
-          <button
-            onClick={handleResend}
-            className="flex items-center gap-2 hover:opacity-80 transition"
-          >
-            <RefreshCw size={20} /> Resend OTP
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-10 mt-8">
+          <button className="flex items-center gap-2 text-[16px] font-medium underline hover:text-brand transition">
+            <TbRefresh size={25} /> Resend OTP
           </button>
-          <button
-            onClick={handleSendEmail}
-            className="flex items-center gap-2 hover:opacity-80 transition"
-          >
-            <Send size={20} /> Send via Email
+          <button className="flex items-center gap-2 text-[16px] font-medium underline hover:text-brand transition">
+            <BiLogoGmail size={20} /> Send via Email
           </button>
         </div>
 
-        {/* Feedback Messages */}
-        {error && (
-          <p className="mt-4 text-red-600 font-medium text-sm">{error}</p>
-        )}
-        {message && (
-          <p className="mt-4 text-blue-600 font-medium text-sm">{message}</p>
-        )}
-
-        {/* Footer Help Text */}
-        <p className="mt-10 text-xs md:text-sm text-gray-500">
-          Didn’t receive the SMS?{" "}
-          <a
-            href="mailto:support@example.com"
-            className="font-bold underline text-blue-600 hover:opacity-80"
-          >
-            Contact support
-          </a>
-        </p>
+        {/* Experience Problem */}
+        <div className="text-center mt-12 mb-4 text-sm text-gray-400">
+          Experiencing email problems?{" "}
+          <span className="underline font-semibold text-black cursor-pointer">Contact Us</span>
+        </div>
       </div>
     </div>
   );
 };
 
-export default SMSOtpPage;
+export default SmsOtpPage;

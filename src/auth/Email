@@ -87,7 +87,7 @@ const EmailOtpPage = () => {
               ref={(el) => (inputsRef.current[index] = el)}
               autoComplete="off"
               inputMode="numeric"
-              className="w-12 h-12 md:w-14 md:h-14 text-center text-xl md:text-2xl font-semibold rounded-lg outline-none border-2 border-gray-400 text-black focus:border-[#253CFE] transition"
+              className="w-12 h-12 md:w-14 md:h-14 text-center text-xl md:text-2xl font-semibold rounded-lg outline-none border-2 border-gray-400 text-black focus:border-gradient-brand transition"
             />
           ))}
         </div>
