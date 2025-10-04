@@ -10,26 +10,26 @@ const DashboardLayout = () => {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Desktop Sidebar */}
-      <div className="hidden md:block w-72">
+      {/* Static Sidebar for desktop (lg and up) */}
+      <div className="hidden lg:block w-72">
         <Sidebar isOpen={true} />
       </div>
 
-      {/* Mobile Sidebar + Animated Overlay */}
+      {/* Overlay for mobile + tablet */}
       <div
-        className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm
-          transition-opacity duration-300 ease-in-out 
+        className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm 
+          transition-opacity duration-300 ease-in-out
           ${isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"}
         `}
         onClick={closeSidebar}
       ></div>
 
-      {/* Mobile Sidebar only (hidden on md and up) */}
-      <div className="md:hidden">
+      {/* Sidebar for mobile + tablet */}
+      <div className="block md:max-lg:block lg:hidden">
         <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
       </div>
 
-      {/* Main content */}
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col relative z-0 bg-white">
         <div className="h-24">
           <Topbar onToggleSidebar={toggleSidebar} />

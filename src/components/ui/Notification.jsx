@@ -4,7 +4,7 @@ import Bell from "../../assets/icons/Notification.png";
 const Notification = () => {
   return (
     <div 
-      className='relative bg-[#F3F3F3]
+      className='relative bg-[#F3F3F3] cursor-pointer
                  w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
                  rounded-full flex items-center justify-center
                  flex-shrink-0 '>

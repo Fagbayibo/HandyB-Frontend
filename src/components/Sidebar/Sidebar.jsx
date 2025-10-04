@@ -13,7 +13,12 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const sidebarLinks = [
     { id: 1, name: "Dashboard", path: "/dashboard", icon: Dashboard },
-    { id: 2, name: "Services", path: "/dashboard/services", icon: ServicesIcon },
+    {
+      id: 2,
+      name: "Services",
+      path: "/dashboard/services",
+      icon: ServicesIcon,
+    },
     { id: 3, name: "Bookings", path: "/dashboard/bookings", icon: Bookings },
     { id: 4, name: "Chat", path: "/dashboard/chat", icon: Chat },
     { id: 5, name: "Payment", path: "/dashboard/payment", icon: Payment },
@@ -22,12 +27,12 @@ const Sidebar = ({ isOpen, onClose }) => {
   return (
     <div
       className={`
-        fixed top-0 left-0 h-full w-72 
+        fixed top-0 left-0 h-full w-72
         bg-gradient-to-b from-[#253CFE] to-[#0A2977]
-        z-50 transform 
-        transition-transform duration-500 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)]
+        z-50 transform transition-transform duration-500 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)]
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        md:translate-x-0 md:static md:w-72
+        md:max-lg:translate-x-${isOpen ? "0" : "full"}
+        lg:translate-x-0 lg:static lg:w-72
         shadow-xl
       `}
     >
@@ -36,16 +41,17 @@ const Sidebar = ({ isOpen, onClose }) => {
         <div className="space-y-10">
           <div className="flex justify-between items-center">
             <img src={Logo} alt="Logo" className="w-36" />
-            {/* Close button for mobile */}
+
+            {/* Close button for mobile + tablet only */}
             <button
               onClick={onClose}
-              className="md:hidden text-white text-3xl font-bold hover:scale-110 transition-transform duration-200"
+              className="block md:max-lg:block lg:hidden text-white text-3xl font-bold hover:scale-110 transition-transform duration-200"
             >
               ×
             </button>
           </div>
 
-          {/* NavLinks */}
+          {/* Nav Links */}
           <div className="space-y-5">
             <p className="uppercase text-[14px] tracking-tight text-white opacity-80">
               MAIN MENU
@@ -57,12 +63,12 @@ const Sidebar = ({ isOpen, onClose }) => {
                   key={link.id}
                   to={link.path}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-3 rounded font-mona text-[16px] 
-                     transition-all duration-300 ease-in-out ${
-                       isActive
-                         ? "bg-white text-[#253CFE] font-semibold"
-                         : "text-white hover:bg-white/10 hover:translate-x-2"
-                     }`
+                    `flex items-center gap-3 px-3 py-3 rounded font-mona text-[16px]
+                    transition-all duration-300 ease-in-out ${
+                      isActive
+                        ? "bg-white text-[#253CFE] font-semibold"
+                        : "text-white hover:bg-white/10 hover:translate-x-2"
+                    }`
                   }
                   onClick={onClose}
                 >
