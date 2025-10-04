@@ -7,7 +7,7 @@ const Notification = () => {
       className='relative bg-[#F3F3F3]
                  w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14
                  rounded-full flex items-center justify-center
-                 flex-shrink-0 shadow-sm'>
+                 flex-shrink-0 '>
       <img 
         src={Bell} 
         alt="Notification" 

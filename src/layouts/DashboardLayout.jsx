@@ -24,11 +24,10 @@ const DashboardLayout = () => {
         onClick={closeSidebar}
       ></div>
 
-     {/* Mobile Sidebar only (hidden on md and up) */}
-<div className="md:hidden">
-  <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
-</div>
-
+      {/* Mobile Sidebar only (hidden on md and up) */}
+      <div className="md:hidden">
+        <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+      </div>
 
       {/* Main content */}
       <div className="flex-1 flex flex-col relative z-0 bg-white">
