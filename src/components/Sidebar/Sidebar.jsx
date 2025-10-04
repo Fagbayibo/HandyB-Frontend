@@ -10,6 +10,7 @@ import { useAuth } from "../../context/AuthContext";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const { logout } = useAuth();
+
   const sidebarLinks = [
     { id: 1, name: "Dashboard", path: "/dashboard", icon: Dashboard },
     { id: 2, name: "Services", path: "/dashboard/services", icon: ServicesIcon },
@@ -21,27 +22,30 @@ const Sidebar = ({ isOpen, onClose }) => {
   return (
     <div
       className={`
-        fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-[#253CFE] to-[#0A2977] z-50
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"} 
+        fixed top-0 left-0 h-full w-72 
+        bg-gradient-to-b from-[#253CFE] to-[#0A2977]
+        z-50 transform 
+        transition-transform duration-500 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)]
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
         md:translate-x-0 md:static md:w-72
+        shadow-xl
       `}
     >
       <div className="px-10 py-10 flex flex-col justify-between h-full">
         {/* Top Section */}
         <div className="space-y-10">
           <div className="flex justify-between items-center">
-            <img src={Logo} alt="HandyHyve Logo" className="w-36" />
+            <img src={Logo} alt="Logo" className="w-36" />
             {/* Close button for mobile */}
             <button
               onClick={onClose}
-              className="md:hidden text-white text-2xl font-bold"
+              className="md:hidden text-white text-3xl font-bold hover:scale-110 transition-transform duration-200"
             >
               ×
             </button>
           </div>
 
-          {/* NavLink */}
+          {/* NavLinks */}
           <div className="space-y-5">
             <p className="uppercase text-[14px] tracking-tight text-white opacity-80">
               MAIN MENU
@@ -53,13 +57,14 @@ const Sidebar = ({ isOpen, onClose }) => {
                   key={link.id}
                   to={link.path}
                   className={({ isActive }) =>
-                    `flex items-center px-3 font-mona gap-3 text-[16px] transition-transform duration-400 ease-in-out ${
-                      isActive
-                        ? "px-3 py-3 bg-white text-[#253CFE] rounded font-semibold"
-                        : "text-white hover:text-white hover:translate-x-2 hover:font-semibold hover:bg-white/10 py-3 px-3 rounded"
-                    }`
+                    `flex items-center gap-3 px-3 py-3 rounded font-mona text-[16px] 
+                     transition-all duration-300 ease-in-out ${
+                       isActive
+                         ? "bg-white text-[#253CFE] font-semibold"
+                         : "text-white hover:bg-white/10 hover:translate-x-2"
+                     }`
                   }
-                  onClick={onClose} // close sidebar on mobile when link clicked
+                  onClick={onClose}
                 >
                   <img src={link.icon} className="w-6" /> {link.name}
                 </NavLink>
@@ -68,12 +73,12 @@ const Sidebar = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* Logout Button */}
+        {/* Logout */}
         <button
           onClick={logout}
-          className="cursor-pointer flex items-center gap-3 px-3 py-3 text-white font-mona hover:bg-white/10 hover:translate-x-2 transition-transform duration-400 ease-in-out rounded"
+          className="cursor-pointer flex items-center gap-3 px-3 py-3 text-white font-mona hover:bg-white/10 hover:translate-x-2 transition-all duration-300 ease-in-out rounded"
         >
-          <IoMdLogOut size={30} /> Logout
+          <IoMdLogOut size={26} /> Logout
         </button>
       </div>
     </div>
