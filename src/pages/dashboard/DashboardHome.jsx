@@ -223,7 +223,8 @@ const DashboardHome = () => {
         </h2>
 
         {/* Dynamic Categories */}
-        <div className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
+
           {/* All button */}
           <button
             onClick={() => setSelectedCategory("All")}
@@ -242,7 +243,7 @@ const DashboardHome = () => {
               <button
                 key={index}
                 onClick={() => setSelectedCategory(category)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200
+                className={`flex items-center gap-2 px-3 py-2 rounded-full border text-sm font-medium transition-all duration-200
                   ${
                     selectedCategory === category
                       ? "bg-blue-100 border-blue-500 text-blue-600"
