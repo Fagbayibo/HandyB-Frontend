@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Sidebar from "../components/Sidebar/Sidebar";
 import Topbar from "../components/Topbar/Topbar";
+import { Outlet } from "react-router";
 
 const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -35,9 +36,9 @@ const DashboardLayout = () => {
           <Topbar onToggleSidebar={toggleSidebar} />
         </div>
 
-        <div className="flex-1">
-          <div className="h-full flex items-center justify-center text-gray-700 text-2xl font-semibold">
-            Page Content (Outlet)
+        <div className="flex-1 px-4 py-8 md:max-lg:px-3 md:px-10">
+          <div className="h-full bg-white">
+           <Outlet/>
           </div>
         </div>
       </div>

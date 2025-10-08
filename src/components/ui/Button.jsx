@@ -22,8 +22,15 @@ const Button = ({
     blue: "bg-blue-500 hover:bg-blue-600 text-white",
     red: "bg-red-500 hover:bg-red-600 text-white",
     green: "bg-green-500 hover:bg-green-600 text-white",
-    black: "bg-black hover:bg-gray-900 text-white",
+    black: `
+  bg-black text-white 
+  hover:bg-black hover:shadow-[0_4px_14px_0_rgba(0,0,0,0.25)] 
+  hover:scale-[1.03] 
+  active:scale-[0.98] 
+  transition-all duration-200 ease-out
+`,
     gray: "bg-gray-400 hover:bg-gray-500 text-white",
+    white: "bg-white hover:bg-black text-black hover:text-white",
   };
 
   const renderIcon = () => {
@@ -40,7 +47,7 @@ const Button = ({
       onClick={onClick}
       disabled={disabled}
       className={`
-        flex items-center justify-center gap-2 rounded font-semibold transition 
+        flex items-center cursor-pointer justify-center gap-2 rounded font-semibold transition 
         ${sizeClasses[size]} 
         ${fontSize ? fontSize : ""} 
         ${colorClasses[color]} 

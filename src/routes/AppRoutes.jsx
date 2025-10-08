@@ -1,5 +1,5 @@
 import React from "react";
-import {Route, Routes} from "react-router";
+import { Route, Routes } from "react-router";
 import ProtectedRoute from "./ProtectedRoute";
 import DashboardHome from "../pages/dashboard/DashboardHome";
 import Login from "../auth/Login";
@@ -10,6 +10,8 @@ import SmsOtpPage from "../auth/SmsOtpPage";
 import VerificationPage from "../auth/Verification";
 import ResetPasswordPage from "../auth/ResetPassword";
 import ForgotPasswordPage from "../auth/ForgotPassword";
+import DashboardLayout from "../layouts/DashboardLayout";
+import Services from "../pages/dashboard/Services";
 
 const AppRoutes = () => {
   return (
@@ -30,10 +32,13 @@ const AppRoutes = () => {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <DashboardHome />
+            <DashboardLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<DashboardHome />} />
+        <Route path="services" element={<Services />} />
+      </Route>
 
       {/* Errror 404 fallback */}
       <Route path="*" element={<p>Page Not Found</p>} />
