@@ -10,7 +10,7 @@ const DashboardLayout = () => {
   const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-y-auto lg:overflow-hidden">
       {/* Static Sidebar for desktop (lg and up) */}
       <div className="hidden lg:block w-72">
         <Sidebar isOpen={true} />
@@ -37,7 +37,7 @@ const DashboardLayout = () => {
         </div>
 
         <div className="flex-1 px-4 py-8 md:max-lg:px-3 md:px-10">
-          <div className="h-full bg-white">
+          <div className="min-h-screen bg-white">
            <Outlet/>
           </div>
         </div>
