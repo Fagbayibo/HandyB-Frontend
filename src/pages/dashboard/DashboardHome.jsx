@@ -253,7 +253,9 @@ const DashboardHome = () => {
               </button>
             )
           )}
-          <a href="#" className="text-blue-600 text-sm font-medium underline ">&amp; More</a>
+          <a href="#" className="text-blue-600 text-sm font-medium underline ">
+            &amp; View More
+          </a>
         </div>
 
         {/* Services Grid (show max 4 filtered) */}
@@ -269,11 +271,11 @@ const DashboardHome = () => {
                   💰 ${item.price}
                 </span>
                 {item.available ? (
-                    <p className="text-green-600 text-sm font-medium bg-green-50 px-3 py-1 rounded-full">
+                  <p className="text-green-600 text-sm font-medium bg-green-50 px-3 py-1 rounded-full">
                     Available Today
                   </p>
-                ): (
-                    <p className="text-red-600 text-sm font-medium bg-red-50 px-3 py-1 rounded-full">
+                ) : (
+                  <p className="text-red-600 text-sm font-medium bg-red-50 px-3 py-1 rounded-full">
                     Unavailable
                   </p>
                 )}
