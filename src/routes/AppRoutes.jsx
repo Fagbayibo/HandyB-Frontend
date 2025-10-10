@@ -12,6 +12,9 @@ import ResetPasswordPage from "../auth/ResetPassword";
 import ForgotPasswordPage from "../auth/ForgotPassword";
 import DashboardLayout from "../layouts/DashboardLayout";
 import Services from "../pages/dashboard/Services";
+import Bookings from "../pages/dashboard/Bookings";
+import Chats from "../pages/dashboard/Chats";
+import Payments from "../pages/dashboard/Payments";
 
 const AppRoutes = () => {
   return (
@@ -38,6 +41,10 @@ const AppRoutes = () => {
       >
         <Route index element={<DashboardHome />} />
         <Route path="services" element={<Services />} />
+        <Route path="bookings" element={<Bookings />} />
+        <Route path="chat" element={<Chats />} />
+        <Route path="payment" element={<Payments />} />
+
       </Route>
 
       {/* Errror 404 fallback */}
