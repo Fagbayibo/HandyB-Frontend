@@ -10,6 +10,8 @@ import "react-phone-number-input/style.css";
 import { IoMdEyeOff } from "react-icons/io";
 import { IoEye } from "react-icons/io5";
 import { TiWarning } from "react-icons/ti";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router";
 
 export default function Signup() {
   const [fullName, setFullName] = useState("");
@@ -23,14 +25,32 @@ export default function Signup() {
 
   const isFormValid = fullName && email && phone && password && termsCondition;
 
-  const handleSubmit = async (e) => {
+    const { signup } = useAuth();  // <-- get signup from context
+  const navigate = useNavigate(); // <-- for redirection
+
+
+const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = { fullName, email, phone, password, termsCondition };
 
     try {
       await signupSchema.validate(formData, { abortEarly: false });
       setError({});
-      console.log("Submitted Data: ", formData);
+      setLoading(true);
+
+      // Call signup function
+      const response = await signup({
+        fullName,
+        email,
+        phone,
+        password,
+      });
+
+      console.log("Signup response:", response);
+
+      // Redirect to OTP verification page
+      navigate("/sms-otp");  // <-- redirect here
+
     } catch (err) {
       if (err.inner) {
         const errors = err.inner.reduce((acc, curr) => {
@@ -38,10 +58,14 @@ export default function Signup() {
           return acc;
         }, {});
         setError(errors);
+      } else {
+        console.error("Signup failed:", err);
+        setError({ general: "Signup failed. Please try again." });
       }
+    } finally {
+      setLoading(false);
     }
   };
-
   const validateField = async (field, value) => {
     try {
       await signupSchema.validateAt(field, {
@@ -284,7 +308,7 @@ export default function Signup() {
           <div className="w-full text-center">
             <button className="text-sm sm:text-md tracking-tight text-center my-6 sm:my-8">
               Already have an account?
-              <a href="#" className="underline font-semibold text-brand">
+              <a href="/login" className="underline font-semibold text-brand">
                 {" "}
                 Log In
               </a>
