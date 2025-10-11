@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import Dashboard from "../../assets/icons/Dashboard.png";
 import ServicesIcon from "../../assets/icons/Services.png";
 import Bookings from "../../assets/icons/Bookings.png";
@@ -10,6 +10,9 @@ import { useAuth } from "../../context/AuthContext";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const { logout } = useAuth();
+  const location = useLocation();
+
+  const isServicesRoute = location.pathname.startsWith("/dashboard/booking/")
 
   const sidebarLinks = [
     { id: 1, name: "Dashboard", path: "/dashboard", icon: Dashboard },
@@ -59,14 +62,18 @@ const Sidebar = ({ isOpen, onClose }) => {
                   key={link.id}
                   to={link.path}
                   end={link.path === "/dashboard"}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-3 rounded font-mona text-[16px]
+                  className={({ isActive }) => {
+                    // keep Services active when viewing booking detail pages
+                    const extraActive =
+                      link.path === "/dashboard/services" && isServicesRoute;
+                    const active = isActive || extraActive;
+                    return `flex items-center gap-3 px-3 py-3 rounded font-mona text-[16px]
                     transition-all duration-300 ease-in-out ${
-                      isActive
+                      active
                         ? "bg-white text-[#253CFE] font-semibold"
                         : "text-white hover:bg-white/10 hover:translate-x-2"
-                    }`
-                  }
+                    }`;
+                  }}
                   onClick={onClose}
                 >
                   {() => (

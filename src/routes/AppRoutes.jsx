@@ -1,26 +1,38 @@
 import React from "react";
-import { Route, Routes } from "react-router";
+// use react-router-dom for DOM apps
+import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
-import DashboardHome from "../pages/dashboard/DashboardHome";
-import Login from "../auth/Login";
+
+// Public pages
 import Home from "../pages/public/Home";
+import Login from "../auth/Login";
 import SignUp from "../auth/SignUp";
+
+// Auth / account flows
 import EmailOtpPage from "../auth/EmailOtpPage";
 import SmsOtpPage from "../auth/SmsOtpPage";
 import VerificationPage from "../auth/Verification";
 import ResetPasswordPage from "../auth/ResetPassword";
 import ForgotPasswordPage from "../auth/ForgotPassword";
+
+// Dashboard & features
 import DashboardLayout from "../layouts/DashboardLayout";
+import DashboardHome from "../pages/dashboard/DashboardHome";
 import Services from "../pages/dashboard/Services";
 import Bookings from "../pages/dashboard/Bookings";
 import Chats from "../pages/dashboard/Chats";
 import Payments from "../pages/dashboard/Payments";
 
+// Booking detail page (by id)
+import BookService from "../pages/dashboard/BookService";
+
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Routes */}
+      {/* ---------------------- Public Routes ---------------------- */}
       <Route path="/" element={<Home />} />
+
+      {/* ---------------------- Auth / Account Routes ---------------------- */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/email-otp" element={<EmailOtpPage />} />
@@ -28,9 +40,11 @@ const AppRoutes = () => {
       <Route path="/verify" element={<VerificationPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+      {/* quick access */}
       <Route path="/dashboard-home" element={<DashboardHome />} />
 
-      {/* Protected Routes */}
+      {/* ---------------------- Protected Dashboard (nested) ---------------------- */}
       <Route
         path="/dashboard"
         element={
@@ -45,9 +59,11 @@ const AppRoutes = () => {
         <Route path="chat" element={<Chats />} />
         <Route path="payment" element={<Payments />} />
 
+        {/* Booking detail nested so it uses DashboardLayout (sidebar) */}
+        <Route path="booking/:id" element={<BookService />} />
       </Route>
 
-      {/* Errror 404 fallback */}
+      {/* ---------------------- Fallback ---------------------- */}
       <Route path="*" element={<p>Page Not Found</p>} />
     </Routes>
   );
