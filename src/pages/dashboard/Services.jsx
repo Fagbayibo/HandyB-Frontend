@@ -292,6 +292,7 @@ const Services = () => {
               key={item.id}
               to={`/dashboard/booking/${item.id}`} // <- changed to match nested route
               aria-label={`Book ${item.name}`}
+              state={{service: item}}
               className="border cursor-pointer border-gray-200 rounded-xl p-5 bg-white hover:shadow-md hover:border-blue-400 transition-all duration-200 block"
             >
               {/* Price + Availability */}
