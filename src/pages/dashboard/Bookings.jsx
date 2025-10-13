@@ -177,9 +177,7 @@ const Bookings = () => {
 							<div className="flex gap-2">
 								<button
 									onClick={() =>
-										navigate(`/dashboard/booking/${b.id}`, {
-											state: { service: null },
-										})
+										navigate(`/dashboard/booking/${b.id}/details`, { state: { booking: b } })
 									}
 									className="text-sm text-blue-600 underline cursor-pointer font-medium"
 								>

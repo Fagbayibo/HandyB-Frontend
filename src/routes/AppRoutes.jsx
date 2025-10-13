@@ -25,6 +25,8 @@ import Payments from "../pages/dashboard/Payments";
 
 // Booking detail page (by id)
 import BookService from "../pages/dashboard/BookService";
+import BookingPayment from "../pages/dashboard/BookingPayment";
+import BookingDetails from "../pages/dashboard/BookingDetails";
 
 const AppRoutes = () => {
   return (
@@ -60,8 +62,19 @@ const AppRoutes = () => {
         <Route path="payment" element={<Payments />} />
 
         {/* Booking detail nested so it uses DashboardLayout (sidebar) */}
-        <Route path="booking/:id" element={<BookService />} />
+        <Route path="service-booking/:id" element={<BookService />} />
+        <Route path="booking/:id/details" element={<BookingDetails/>}/>
       </Route>
+
+      {/* Booking Payment */}
+      <Route
+        path="booking/:id/payment"
+        element={
+          <ProtectedRoute>
+            <BookingPayment />
+          </ProtectedRoute>
+        }
+      />
 
       {/* ---------------------- Fallback ---------------------- */}
       <Route path="*" element={<p>Page Not Found</p>} />

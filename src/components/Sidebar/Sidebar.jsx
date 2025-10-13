@@ -12,7 +12,16 @@ const Sidebar = ({ isOpen, onClose }) => {
   const { logout } = useAuth();
   const location = useLocation();
 
-  const isServicesRoute = location.pathname.startsWith("/dashboard/booking/")
+  // current pathname helper
+  const path = location.pathname;
+
+  // route flags
+  const isServicesRoute = path.startsWith("/dashboard/services") 
+  || path.startsWith("/dashboard/service");
+  // true for `/dashboard/bookings`
+  const isBookingRoute = path.startsWith("/dashboard/bookings");
+  // true for nested booking pages under `/dashboard/booking/:id` (including details)
+  const isBookingNested = path.startsWith("/dashboard/booking/");
 
   const sidebarLinks = [
     { id: 1, name: "Dashboard", path: "/dashboard", icon: Dashboard },
@@ -63,9 +72,12 @@ const Sidebar = ({ isOpen, onClose }) => {
                   to={link.path}
                   end={link.path === "/dashboard"}
                   className={({ isActive }) => {
-                    // keep Services active when viewing booking detail pages
+                    // keep Services active when viewing services pages
+                    // and keep Bookings active when viewing nested booking pages
                     const extraActive =
-                      link.path === "/dashboard/services" && isServicesRoute;
+                      (link.path === "/dashboard/services" && isServicesRoute) ||
+                      (link.path === "/dashboard/bookings" && (isBookingRoute || isBookingNested));
+
                     const active = isActive || extraActive;
                     return `flex items-center gap-3 px-3 py-3 rounded font-mona text-[16px]
                     transition-all duration-300 ease-in-out ${

@@ -225,16 +225,22 @@ const BookService = () => {
               <button
                 type="button"
                 onClick={() => {
-                  // TODO: implement submit (validate + API)
+                  // create booking payload
                   const payload = {
                     serviceId: service.id,
+                    serviceName: service.name,
+                    price: service.price,
                     email,
                     phone,
                     address,
                     dateTime,
                     notes,
                   };
-                  console.log("Book now clicked - payload:", payload);
+
+    
+
+                  // navigate to booking payment page and pass booking info via location state
+                  navigate(`/booking/${id}/payment`, { state: { booking: payload } });
                 }}
                 className="w-full py-3 bg-black text-white rounded-md font-semibold"
               >
