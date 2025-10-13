@@ -236,10 +236,6 @@ const BookService = () => {
                     dateTime,
                     notes,
                   };
-
-    
-
-                  // navigate to booking payment page and pass booking info via location state
                   navigate(`/booking/${id}/payment`, { state: { booking: payload } });
                 }}
                 className="w-full py-3 bg-black text-white rounded-md font-semibold"

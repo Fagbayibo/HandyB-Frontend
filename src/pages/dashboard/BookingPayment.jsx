@@ -1,6 +1,6 @@
 import { ArrowLeftCircle } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ApplePay from "../../assets/icons/ApplePay.png";
 import Gpay from "../../assets/icons/gpay.png";
 import MasterCard from "../../assets/icons/mastercard.png";
@@ -9,7 +9,18 @@ import Button from "../../components/ui/Button";
 
 const BookingPayment = () => {
   const [selected, setSelected] = useState("mastercard");
+  const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const bookingState = location.state?.booking ?? null;
+
+   const [bookingDetails, setBookingDetails] = useState(bookingState);
+
+  useEffect(() => {
+    if (!bookingState) {
+      // placeholder for future fetch
+    }
+  }, [id, bookingState]);
 
   const handleBack = () => {
     navigate(-1);
@@ -76,7 +87,7 @@ const BookingPayment = () => {
               Service
             </p>
             <p className="text-md font-medium tracking-tight font-poppins text-gray-700">
-              Underground Tank (1,500 Gallons)
+            {bookingDetails.serviceName}
             </p>
           </div>
           {/* Services */}
@@ -85,7 +96,7 @@ const BookingPayment = () => {
               Price
             </p>
             <p className="text-md font-semibold tracking-tight font-poppins  text-gray-700">
-              💰 $100
+              💰 ${bookingDetails.price}
             </p>
           </div>
           {/* Services */}
