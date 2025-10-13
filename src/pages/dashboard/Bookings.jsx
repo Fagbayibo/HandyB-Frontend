@@ -99,14 +99,14 @@ const Bookings = () => {
 				</div>
 
 				<div className="flex items-center gap-3">
-					<div className="hidden sm:flex items-center gap-2 bg-white rounded-full px-1 py-1 shadow-sm">
+					<div className="hidden sm:flex items-center gap-2 bg-white rounded-full px-3 py-3">
 						{Tabs.map((t) => (
 							<button
 								key={t}
 								onClick={() => setTab(t)}
-								className={`px-3 py-1 rounded-full text-sm font-semibold font-poppins transition ${
+								className={`px-3 py-1 rounded-md text-sm font-medium tracking-tight font-poppins transition ${
 									tab === t
-										? "bg-blue-600 text-white"
+										? "bg-gray-100/40 border-brand border-1 text-black"
 										: "text-gray-700 hover:bg-gray-50"
 								}`}
 							>
@@ -119,21 +119,21 @@ const Bookings = () => {
 						))}
 					</div>
 
-					<button
+					{/* <button
 						onClick={() => alert("Open filter UI")}
 						className="inline-flex items-center gap-2 bg-white border rounded-lg px-3 py-2 text-sm shadow-sm hover:shadow-md"
 						aria-label="Filter Bookings"
 					>
 						<FiFilter />
 						<span className="hidden sm:inline">Filter Bookings</span>
-					</button>
+					</button> */}
 
 					<button
 						onClick={() => navigate("/dashboard/services")}
-						className="inline-flex items-center gap-2 bg-black text-white px-3 py-2 rounded-lg text-sm shadow-sm hover:opacity-95"
+						className="inline-flex items-center gap-2 bg-black text-white px-3 py-2 rounded-md text-sm shadow-sm hover:opacity-95"
 						aria-label="Book a Service"
 					>
-						<BiPlus />
+						<BiPlus  />
 						<span className="hidden sm:inline">Book a Service</span>
 					</button>
 				</div>
@@ -148,20 +148,20 @@ const Bookings = () => {
 				{filtered.map((b) => (
 					<div
 						key={b.id}
-						className="flex items-center justify-between bg-white border rounded-lg p-4 shadow-sm"
+						className="flex items-center justify-between bg-white  border-gray-200 border-2 rounded-lg px-8 py-4"
 					>
 						<div className="flex items-center gap-4">
-							<div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center text-xl">
+							<div className="w-16 h-16 rounded-lg bg-gray-50 flex items-center justify-center text-xl">
 								<span aria-hidden>{b.icon}</span>
 							</div>
 
 							<div>
 								<div className="flex items-center gap-3">
-									<h3 className="font-semibold text-gray-800">
+									<h3 className="font-semibold text-gray-800 font-poppins text-lg">
 										{b.title}
 									</h3>
 									<span
-										className={`text-xs font-medium px-2 py-1 rounded-full ${statusLabel[b.status].color}`}
+										className={`text-xs font-medium px-2 py-1 rounded-full font-poppins ${statusLabel[b.status].color}`}
 									>
 										{statusLabel[b.status].text}
 									</span>
@@ -173,7 +173,7 @@ const Bookings = () => {
 						</div>
 
 						<div className="flex items-center gap-4">
-							<div className="text-lg font-semibold">${b.price}</div>
+							<div className="text-lg font-semibold font-poppins  text-gray-800">${b.price}</div>
 							<div className="flex gap-2">
 								<button
 									onClick={() =>
@@ -181,18 +181,18 @@ const Bookings = () => {
 											state: { service: null },
 										})
 									}
-									className="text-sm text-blue-600 underline"
+									className="text-sm text-blue-600 underline cursor-pointer font-medium"
 								>
-									View
+									View details
 								</button>
-								<button
+								{/* <button
 									onClick={() =>
 										alert("Open cancel/modify flow")
 									}
 									className="text-sm text-red-500"
 								>
 									Cancel
-								</button>
+								</button> */}
 							</div>
 						</div>
 					</div>
