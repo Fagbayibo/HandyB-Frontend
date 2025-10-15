@@ -27,6 +27,19 @@ export async function signupRequest(payload) {
     );
   }
 }
+
+export async function emailOtpRequest(otpPayload) {
+  try {
+    const { data } = await api.post("auth/verify-otp", otpPayload);
+    return data;
+  } catch (err) {
+    const message =
+      err.response?.data || err.message || "Email OTP Verification Failed";
+    throw new Error(
+      typeof message === "string" ? message : JSON.stringify(message)
+    );
+  }
+}
 export async function loginRequest({ phone, password }) {
   // When using real backend:
   // const { data } = await api.post("/auth/login", { email, password });
