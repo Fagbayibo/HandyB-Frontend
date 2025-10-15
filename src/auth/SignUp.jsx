@@ -3,7 +3,7 @@ import MainLogo from "../assets/images/HandyLogo.png";
 import GoogleIcon from "../assets/images/google.png";
 import AppleIcon from "../assets/images/apple.png";
 import FacebookIcon from "../assets/images/facebook.png";
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { signupSchema } from "../utils/validation";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
@@ -12,45 +12,122 @@ import { IoEye } from "react-icons/io5";
 import { TiWarning } from "react-icons/ti";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router";
+import { checkHealth } from "../services/authApi";
+import Notification from "../components/Notification";
 
 export default function Signup() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [termsCondition, setTermCondition] = useState(false);
+  const [alert, setAlert] = useState(true);
+  const [alertMsg, setMsgAlert] = useState(false);
+  const [notif, setNotif] = useState({
+    open: false,
+    type: "success",
+    message: "",
+  });
 
-  const isFormValid = fullName && email && phone && password && termsCondition;
+  // redirect timing and timers
+  const redirectDelayMs = 3000; // wait 3 seconds before navigating
+  const successDisplayMs = 800; // time to show "Account created" before showing redirect msg
+  const successTimer = useRef(null);
+  const redirectTimer = useRef(null);
 
-    const { signup } = useAuth();  // <-- get signup from context
-  const navigate = useNavigate(); // <-- for redirection
+  const isFormValid =
+    fullName &&
+    email &&
+    phoneNumber &&
+    password &&
+    confirmPassword &&
+    termsCondition;
 
+  const { signup } = useAuth();
+  const navigate = useNavigate();
 
-const handleSubmit = async (e) => {
+  useEffect(() => {
+    checkHealth().then(console.log).catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (successTimer.current) clearTimeout(successTimer.current);
+      if (redirectTimer.current) clearTimeout(redirectTimer.current);
+    };
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = { fullName, email, phone, password, termsCondition };
 
+    if (!isFormValid) {
+      setError({ message: "Please fill all field and accept terms" });
+      return;
+    }
+
+    // validation object (must match signupSchema keys)
+    const validationObj = {
+      fullName,
+      email,
+      phone: phoneNumber,
+      password,
+      confirmPassword,
+      termsCondition,
+    };
+
+    // API payload (shape your backend expects)
+    const apiPayload = {
+      fullname: fullName,
+      email,
+      phoneNumber,
+      password,
+      confirmpassword: confirmPassword,
+      otpMethod: "email",
+    };
     try {
-      await signupSchema.validate(formData, { abortEarly: false });
+      // validate using schema-friendly object
+      await signupSchema.validate(validationObj, { abortEarly: false });
       setError({});
       setLoading(true);
 
-      // Call signup function
-      const response = await signup({
-        fullName,
-        email,
-        phone,
-        password,
-      });
-
+      // Call signup function with backend-shaped payload
+      const response = await signup(apiPayload);
       console.log("Signup response:", response);
+      console.log(response.success);
 
-      // Redirect to OTP verification page
-      navigate("/sms-otp");  // <-- redirect here
+      if (response.success === true) {
+        // show first message ("Account created successfully")
+        setNotif({
+          open: true,
+          type: "success",
+          message: "Account created successfully",
+        });
 
+        // after a short display, replace with the redirecting message, then navigate
+        successTimer.current = setTimeout(() => {
+          setNotif({
+            open: true,
+            type: "success",
+            message: `Redirecting in ${redirectDelayMs / 1000}s...`,
+          });
+
+          // after redirectDelayMs navigate to email-otp
+          redirectTimer.current = setTimeout(() => {
+            setNotif((s) => ({ ...s, open: false }));
+            navigate("/email-otp", {
+              state: {
+                email: response.email,
+                phoneNumber: response.phoneNumber,
+              },
+            });
+          }, redirectDelayMs);
+        }, successDisplayMs);
+      }
     } catch (err) {
       if (err.inner) {
         const errors = err.inner.reduce((acc, curr) => {
@@ -58,9 +135,20 @@ const handleSubmit = async (e) => {
           return acc;
         }, {});
         setError(errors);
+        // show validation summary (optional)
+        setNotif({
+          open: true,
+          type: "error",
+          message: "Please fix the highlighted fields",
+        });
       } else {
         console.error("Signup failed:", err);
         setError({ general: "Signup failed. Please try again." });
+        setNotif({
+          open: true,
+          type: "error",
+          message: err.message || "Signup failed",
+        });
       }
     } finally {
       setLoading(false);
@@ -71,9 +159,11 @@ const handleSubmit = async (e) => {
       await signupSchema.validateAt(field, {
         fullName,
         email,
-        phone,
+        // provide `phone` to the validator (value comes from phoneNumber input)
+        phone: phoneNumber,
         password,
         termsCondition,
+        confirmPassword,
         [field]: value,
       });
       setError((prev) => ({ ...prev, [field]: "" }));
@@ -83,251 +173,312 @@ const handleSubmit = async (e) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-white font-poppins">
-      {/* Left Section (Form) */}
-      <div className="w-full lg:w-1/2 overflow-y-auto p-6 sm:p-10 lg:p-16 flex flex-col items-center mt-6 sm:mt-12 space-y-6">
-        <div className="flex items-center flex-col">
-          <img src={MainLogo} alt="logo" className="w-28 sm:w-36" />
+    <>
+      <Notification
+        open={notif.open}
+        type={notif.type}
+        message={notif.message}
+        onClose={() => {
+          // clear any pending timers when user manually closes the notification
+          if (successTimer.current) clearTimeout(successTimer.current);
+          if (redirectTimer.current) clearTimeout(redirectTimer.current);
+          setNotif((s) => ({ ...s, open: false }));
+        }}
+      />
+      {/* page */}
+      <div className="min-h-screen flex flex-col lg:flex-row bg-white font-poppins relative">
+        {/* Notification Bell (replaced by Notification component) */}
 
-          {/* Header */}
-          <div className="space-y-2 mt-6 text-center">
-            <h2 className="text-2xl sm:text-[28px] font-medium tracking-tighter">
-              Create Your Account
-            </h2>
-            <p className="tracking-tight text-sm sm:text-[16px] px-4 sm:px-12 lg:px-[120px]">
-              Book trusted home services, track rewards, and manage everything
-              in one place.
-            </p>
+        {/* Left Section (Form) */}
+        <div className="w-full lg:w-1/2 overflow-y-auto p-6 sm:p-10 lg:p-16 flex flex-col items-center mt-6 sm:mt-12 space-y-6">
+          <div className="flex items-center flex-col">
+            <img src={MainLogo} alt="logo" className="w-28 sm:w-36" />
+
+            {/* Header */}
+            <div className="space-y-2 mt-6 text-center">
+              <h2 className="text-2xl sm:text-[28px] font-medium tracking-tighter">
+                Create Your Account
+              </h2>
+              <p className="tracking-tight text-sm sm:text-[16px] px-4 sm:px-12 lg:px-[120px]">
+                Book trusted home services, track rewards, and manage everything
+                in one place.
+              </p>
+            </div>
+
+            {/* Oauth */}
+            <div className="flex items-center space-x-4 sm:space-x-6 lg:space-x-10 mt-5 px-4 sm:px-6 bg-lightgray py-2 rounded-full">
+              <p className="text-sm sm:text-[16px] font-medium tracking-tight text-gray-800">
+                Continue with
+              </p>
+              <div className="flex items-center justify-center space-x-3 sm:space-x-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center cursor-pointer">
+                  <img
+                    src={GoogleIcon}
+                    alt="google icon"
+                    className="w-6 sm:w-8"
+                  />
+                </div>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center cursor-pointer">
+                  <img
+                    src={AppleIcon}
+                    alt="apple icon"
+                    className="w-5 sm:w-6"
+                  />
+                </div>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center cursor-pointer">
+                  <img
+                    src={FacebookIcon}
+                    alt="facebook icon"
+                    className="w-6 sm:w-8"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Oauth */}
-          <div className="flex items-center space-x-4 sm:space-x-6 lg:space-x-10 mt-5 px-4 sm:px-6 bg-lightgray py-2 rounded-full">
-            <p className="text-sm sm:text-[16px] font-medium tracking-tight text-gray-800">
-              Continue with
-            </p>
-            <div className="flex items-center justify-center space-x-3 sm:space-x-4">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center cursor-pointer">
-                <img
-                  src={GoogleIcon}
-                  alt="google icon"
-                  className="w-6 sm:w-8"
-                />
-              </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center cursor-pointer">
-                <img src={AppleIcon} alt="apple icon" className="w-5 sm:w-6" />
-              </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center cursor-pointer">
-                <img
-                  src={FacebookIcon}
-                  alt="facebook icon"
-                  className="w-6 sm:w-8"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Form Fields */}
-        <div className="w-full max-w-[480px] mt-4">
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col space-y-6 sm:space-y-8"
-          >
-            {/* Full Name */}
-            <div className="flex flex-col space-y-1 w-full">
-              <label className="font-medium tracking-tight text-md">
-                Full Name
-              </label>
-              <input
-                value={fullName}
-                onChange={(e) => {
-                  setFullName(e.target.value);
-                  validateField("fullName", e.target.value);
-                }}
-                type="text"
-                placeholder="Enter your full name"
-                className={`h-12 w-full rounded-xl border pl-6 pr-4 text-sm sm:text-base text-gray-700 placeholder-gray-400 outline-none transition
-                  ${
-                    error.fullName
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-200"
-                      : "border-inputborder focus:border-blue-500 focus:ring-blue-200"
-                  }
-                `}
-              />
-              {error.fullName && (
-                <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
-                  <TiWarning size={18} /> {error.fullName}
-                </p>
-              )}
-            </div>
-
-            {/* Email */}
-            <div className="flex flex-col space-y-1 w-full">
-              <label className="font-medium tracking-tight text-md">
-                Email Address
-              </label>
-              <input
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  validateField("email", e.target.value);
-                }}
-                type="email"
-                placeholder="Enter your email address"
-                className={`h-12 w-full rounded-xl border pl-6 pr-4 text-sm sm:text-base text-gray-700 placeholder-gray-400 outline-none transition
-                  ${
-                    error.email
-                      ? "border-red-500 focus:border-red-500 focus:ring-red-200"
-                      : "border-inputborder focus:border-blue-500 focus:ring-blue-200"
-                  }
-                `}
-              />
-              {error.email && (
-                <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
-                  <TiWarning size={18} /> {error.email}
-                </p>
-              )}
-            </div>
-
-            {/* Phone */}
-            <div className="flex flex-col space-y-1 w-full">
-              <label className="font-medium tracking-tight text-md">
-                Phone number
-              </label>
-              <PhoneInput
-                placeholder="Enter your phone number"
-                defaultCountry="US"
-                value={phone}
-                onChange={(val) => {
-                  setPhone(val);
-                  validateField("phone", val);
-                }}
-                className={`h-12 w-full rounded-xl border pl-4 pr-4 text-sm sm:text-base text-gray-700 placeholder-gray-400 outline-none
-                  ${error.phone ? "border-red-500" : "border-inputborder"}
-                `}
-              />
-              {error.phone && (
-                <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
-                  <TiWarning size={18} /> {error.phone}
-                </p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div className="flex flex-col space-y-1 w-full">
-              <label className="font-medium tracking-tight text-md">
-                Password
-              </label>
-              <div className="relative">
+          {/* Form Fields */}
+          <div className="w-full max-w-[480px] mt-4">
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col space-y-6 sm:space-y-8"
+            >
+              {/* Full Name */}
+              <div className="flex flex-col space-y-1 w-full">
+                <label className="font-medium tracking-tight text-md">
+                  Full Name
+                </label>
                 <input
-                  value={password}
+                  value={fullName}
                   onChange={(e) => {
-                    setPassword(e.target.value);
-                    validateField("password", e.target.value);
+                    setFullName(e.target.value);
+                    validateField("fullName", e.target.value);
                   }}
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  className={`h-12 w-full rounded-xl border text-sm sm:text-base pl-6 pr-10 text-gray-700 placeholder-gray-400 outline-none transition
+                  type="text"
+                  placeholder="Enter your full name"
+                  className={`h-12 w-full rounded-xl border pl-6 pr-4 text-sm sm:text-base text-gray-700 placeholder-gray-400 outline-none transition
                     ${
-                      error.password
+                      error.fullName
                         ? "border-red-500 focus:border-red-500 focus:ring-red-200"
                         : "border-inputborder focus:border-blue-500 focus:ring-blue-200"
                     }
                   `}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
-                >
-                  {showPassword ? (
-                    <IoEye size={20} className="text-gray-600" />
-                  ) : (
-                    <IoMdEyeOff size={20} className="text-gray-600" />
-                  )}
-                </button>
+                {error.fullName && (
+                  <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
+                    <TiWarning size={18} /> {error.fullName}
+                  </p>
+                )}
               </div>
-              {error.password && (
-                <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
-                  <TiWarning size={18} /> {error.password}
-                </p>
-              )}
-            </div>
 
-            {/* Terms */}
-            <div className="flex flex-col w-full -mt-2 space-y-1">
-              <div className="flex items-center space-x-3">
-                <div
-                  className={`relative flex items-center justify-center h-5 w-5 rounded 
+              {/* Email */}
+              <div className="flex flex-col space-y-1 w-full">
+                <label className="font-medium tracking-tight text-md">
+                  Email Address
+                </label>
+                <input
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    validateField("email", e.target.value);
+                  }}
+                  type="email"
+                  placeholder="Enter your email address"
+                  className={`h-12 w-full rounded-xl border pl-6 pr-4 text-sm sm:text-base text-gray-700 placeholder-gray-400 outline-none transition
                     ${
-                      error.termsCondition
-                        ? "border-2 border-red-500"
-                        : "border border-inputborder"
+                      error.email
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-200"
+                        : "border-inputborder focus:border-blue-500 focus:ring-blue-200"
+                    }
+                  `}
+                />
+                {error.email && (
+                  <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
+                    <TiWarning size={18} /> {error.email}
+                  </p>
+                )}
+              </div>
+
+              {/* Phone */}
+              <div className="flex flex-col space-y-1 w-full">
+                <label className="font-medium tracking-tight text-md">
+                  Phone number
+                </label>
+                <PhoneInput
+                  placeholder="Enter your phone number"
+                  defaultCountry="US"
+                  value={phoneNumber}
+                  onChange={(val) => {
+                    setPhoneNumber(val);
+                    validateField("phone", val);
+                  }}
+                  className={`h-12 w-full rounded-xl border pl-4 pr-4 text-sm sm:text-base text-gray-700 placeholder-gray-400 outline-none
+                    ${error.phone ? "border-red-500" : "border-inputborder"}
+                  `}
+                />
+                {error.phone && (
+                  <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
+                    <TiWarning size={18} /> {error.phone}
+                  </p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className="flex flex-col space-y-1 w-full">
+                <label className="font-medium tracking-tight text-md">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      validateField("password", e.target.value);
+                    }}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    className={`h-12 w-full rounded-xl border text-sm sm:text-base pl-6 pr-10 text-gray-700 placeholder-gray-400 outline-none transition
+                      ${
+                        error.password
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-200"
+                          : "border-inputborder focus:border-blue-500 focus:ring-blue-200"
+                      }
+                    `}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                  >
+                    {showPassword ? (
+                      <IoEye size={20} className="text-gray-600" />
+                    ) : (
+                      <IoMdEyeOff size={20} className="text-gray-600" />
+                    )}
+                  </button>
+                </div>
+                {error.password && (
+                  <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
+                    <TiWarning size={18} /> {error.password}
+                  </p>
+                )}
+              </div>
+
+              {/* Confirm Password */}
+              <div className="flex flex-col space-y-1 w-full">
+                <label className="font-medium tracking-tight text-md">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <input
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      validateField("confirmPassword", e.target.value);
+                    }}
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm your password"
+                    className={`h-12 w-full rounded-xl border text-sm sm:text-base pl-6 pr-10 text-gray-700 placeholder-gray-400 outline-none transition
+                      ${
+                        error.confirmPassword
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-200"
+                          : "border-inputborder focus:border-blue-500 focus:ring-blue-200"
+                      }
+                    `}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                  >
+                    {showConfirmPassword ? (
+                      <IoEye size={20} className="text-gray-600" />
+                    ) : (
+                      <IoMdEyeOff size={20} className="text-gray-600" />
+                    )}
+                  </button>
+                </div>
+                {error.confirmPassword && (
+                  <p className="tracking-tight text-red-500 flex items-center gap-2 text-sm mt-1">
+                    <TiWarning size={18} /> {error.confirmPassword}
+                  </p>
+                )}
+              </div>
+
+              {/* Terms */}
+              <div className="flex flex-col w-full -mt-2 space-y-1">
+                <div className="flex items-center space-x-3">
+                  <div
+                    className={`relative flex items-center justify-center h-5 w-5 rounded 
+                      ${
+                        error.termsCondition
+                          ? "border-2 border-red-500"
+                          : "border border-inputborder"
+                      }
+                    `}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={termsCondition}
+                      onChange={() => {
+                        setTermCondition(!termsCondition);
+                        validateField("termsCondition", !termsCondition);
+                      }}
+                      className="absolute inset-0 h-full w-full opacity-0 cursor-pointer peer"
+                    />
+                    <div className="peer-checked:bg-blue-500 peer-checked:border-blue-500 h-3 w-3 rounded-sm"></div>
+                  </div>
+                  <p className="text-sm sm:text-md tracking-tight">
+                    I agree to the{" "}
+                    <a href="#" className="underline font-semibold text-brand">
+                      Terms & Policy
+                    </a>
+                    .
+                  </p>
+                </div>
+              </div>
+
+              {/* Submit */}
+              <div>
+                <button
+                  type="submit"
+                  disabled={!isFormValid || loading}
+                  className={`w-full py-3 text-white text-[16px] tracking-tight rounded-md font-semibold cursor-pointer transition
+                    ${
+                      isFormValid
+                        ? "bg-black hover:bg-gray-900"
+                        : "bg-gray-400 cursor-not-allowed"
                     }
                   `}
                 >
-                  <input
-                    type="checkbox"
-                    checked={termsCondition}
-                    onChange={() => {
-                      setTermCondition(!termsCondition);
-                      validateField("termsCondition", !termsCondition);
-                    }}
-                    className="absolute inset-0 h-full w-full opacity-0 cursor-pointer peer"
-                  />
-                  <div className="peer-checked:bg-blue-500 peer-checked:border-blue-500 h-3 w-3 rounded-sm"></div>
-                </div>
-                <p className="text-sm sm:text-md tracking-tight">
-                  I agree to the{" "}
-                  <a href="#" className="underline font-semibold text-brand">
-                    Terms & Policy
-                  </a>
-                  .
-                </p>
+                  {loading ? "Creating..." : "Sign Up"}
+                </button>
               </div>
-            </div>
+            </form>
 
-            {/* Submit */}
-            <div>
-              <button
-                type="submit"
-                disabled={!isFormValid || loading}
-                className={`w-full py-3 text-white text-[16px] tracking-tight rounded-md font-semibold cursor-pointer transition
-                  ${
-                    isFormValid
-                      ? "bg-black hover:bg-gray-900"
-                      : "bg-gray-400 cursor-not-allowed"
-                  }
-                `}
-              >
-                {loading ? "Loading..." : "Sign Up"}
+            <div className="w-full text-center">
+              <button className="text-sm sm:text-md tracking-tight text-center my-6 sm:my-8">
+                Already have an account?
+                <a href="/login" className="underline font-semibold text-brand">
+                  {" "}
+                  Log In
+                </a>
               </button>
             </div>
-          </form>
+          </div>
+        </div>
 
-          <div className="w-full text-center">
-            <button className="text-sm sm:text-md tracking-tight text-center my-6 sm:my-8">
-              Already have an account?
-              <a href="/login" className="underline font-semibold text-brand">
-                {" "}
-                Log In
-              </a>
-            </button>
+        {/* Right */}
+        <div className="w-1/2 hidden lg:block md:hidden">
+          <div className="sticky top-0 h-screen">
+            <img
+              src={LoginImage}
+              className="w-full h-full object-cover"
+              alt="Login background"
+              loading="lazy"
+            />
           </div>
         </div>
       </div>
-
-      {/* Right */}
-      <div className="w-1/2 hidden lg:block md:hidden">
-        <div className="sticky top-0 h-screen">
-          <img
-            src={LoginImage}
-            className="w-full h-full object-cover"
-            alt="Login background"
-            loading="lazy"
-          />
-        </div>
-      </div>
-    </div>
+    </>
   );
 }

@@ -29,6 +29,10 @@ export const signupSchema = yup.object().shape({
     .string()
     .required("Password is required")
     .min(6, "Password must be at least 6 characters"),
+  confirmPassword: yup
+    .string()
+    .required("Confirm password is required")
+    .oneOf([yup.ref("password")], "Passwords must match"),
   termsCondition: yup
     .boolean()
     .oneOf([true], "You must accept the Terms & Policy"), // ensure checkbox is checked

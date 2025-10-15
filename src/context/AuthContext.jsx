@@ -4,27 +4,24 @@ import { loginRequest, signupRequest } from "../services/authApi.js";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);          // user object
-  const [loading, setLoading] = useState(false);   // API request loading
-  const [initializing, setInitializing] = useState(true); // for refresh handling
-
-  // On mount, check for saved token
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false); 
+  const [initializing, setInitializing] = useState(true); 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (token) {
-      // Optionally, you can fetch the user profile here from API
       setUser({ token });
     }
-    setInitializing(false); // finished initializing
+    setInitializing(false); 
   }, []);
 
   // Login function
   const login = async (credentials) => {
     setLoading(true);
     try {
-      const data = await loginRequest(credentials); // API call
-      localStorage.setItem("authToken", data.token); // save token
-      setUser(data); // set user data
+      const data = await loginRequest(credentials); 
+      localStorage.setItem("authToken", data.token); 
+      setUser(data); 
       return data;
     } finally {
       setLoading(false);
@@ -44,6 +41,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+
+  
   // Logout function
   const logout = () => {
     setUser(null);

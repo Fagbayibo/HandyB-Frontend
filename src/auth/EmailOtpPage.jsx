@@ -4,9 +4,12 @@ import { useRef, useState } from "react";
 import { TbRefresh } from "react-icons/tb";
 import { BiLogoGmail } from "react-icons/bi";
 import { FaPhoneAlt } from "react-icons/fa";
+import { useLocation } from "react-router";
 
 
 const EmailOtpPage = () => {
+  const location = useLocation()
+  const email = location.state?.email
   const [otp, setOtp] = useState(["", "", "", "", ""]);
   const inputsRef = useRef([]);
   const [isValid, setIsValid] = useState(null);
@@ -70,7 +73,7 @@ const EmailOtpPage = () => {
           </p>
           <p className="md:max-lg:text-blue-500 tracking-tight text-[14px] md:text-[18px] text-gray-700">
             We’ve sent a <span className="font-semibold">Verification OTP</span> to{" "}
-            <span className="font-semibold">Fagbayibooluwasegun@gmail.com</span>. Please check your inbox and fill the boxes to confirm your account.
+            <span className="font-semibold">{email}</span>. Please check your inbox and fill the boxes to confirm your account.
           </p>
         </div>
 
