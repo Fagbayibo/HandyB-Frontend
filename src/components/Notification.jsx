@@ -5,6 +5,7 @@ export default function Notification({
   type = "success",
   message = "",
   onClose,
+  autoCloseMs = 4000, // default auto-close after 4s; set 0 to disable
 }) {
   // keep mounted during exit animation
   const [visible, setVisible] = useState(open);
@@ -12,10 +13,28 @@ export default function Notification({
 
   useEffect(() => {
     let timeout;
+    let autoCloseTimer;
     if (open) {
       setVisible(true);
       // trigger enter in next frame so transitions apply
       requestAnimationFrame(() => setAnimState("entering"));
+
+      // auto-close after autoCloseMs if provided
+      if (autoCloseMs && autoCloseMs > 0) {
+        autoCloseTimer = setTimeout(() => {
+          if (typeof onClose === "function") {
+            onClose();
+          } else {
+            // fallback: close internally (trigger exit animation)
+            setAnimState("exiting");
+            // remove from DOM after exit duration (match exit timeout below)
+            setTimeout(() => {
+              setAnimState("exited");
+              setVisible(false);
+            }, 300);
+          }
+        }, autoCloseMs);
+      }
     } else if (visible) {
       setAnimState("exiting");
       // match duration below (ms)
@@ -24,8 +43,11 @@ export default function Notification({
         setVisible(false);
       }, 300);
     }
-    return () => clearTimeout(timeout);
-  }, [open, visible]);
+    return () => {
+      clearTimeout(timeout);
+      if (autoCloseTimer) clearTimeout(autoCloseTimer);
+    };
+  }, [open, visible, autoCloseMs, onClose]);
 
   if (!visible) return null;
 

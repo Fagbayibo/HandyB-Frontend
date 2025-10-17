@@ -27,6 +27,7 @@ import Payments from "../pages/dashboard/Payments";
 import BookService from "../pages/dashboard/BookService";
 import BookingPayment from "../pages/dashboard/BookingPayment";
 import BookingDetails from "../pages/dashboard/BookingDetails";
+import VerificationGuard from "./VerificationGuard";
 
 const AppRoutes = () => {
   return (
@@ -39,7 +40,14 @@ const AppRoutes = () => {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/email-otp" element={<EmailOtpPage />} />
       <Route path="/sms-otp" element={<SmsOtpPage />} />
-      <Route path="/verify" element={<VerificationPage />} />
+      <Route
+        path="/verify"
+        element={
+          <VerificationGuard>
+            <VerificationPage />
+          </VerificationGuard>
+        }
+      />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
@@ -63,7 +71,7 @@ const AppRoutes = () => {
 
         {/* Booking detail nested so it uses DashboardLayout (sidebar) */}
         <Route path="service-booking/:id" element={<BookService />} />
-        <Route path="booking/:id/details" element={<BookingDetails/>}/>
+        <Route path="booking/:id/details" element={<BookingDetails />} />
       </Route>
 
       {/* Booking Payment */}

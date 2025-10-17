@@ -1,11 +1,7 @@
 import axios from "axios";
 
-// ✅ Automatically switch base URL based on environment
-const isLocal = window.location.hostname === "localhost";
-
-export const BASE_URL = isLocal
-  ? "http://localhost:5001/api/v1/" // local backend
-  : "https://handy-backend-ftsz.onrender.com/api/v1/"; // deployed backend
+// ✅ Base URL comes directly from environment
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -15,10 +11,9 @@ const api = axios.create({
   timeout: 15000,
 });
 
-// ✅ Interceptors (for tokens, logging)
+// ✅ Attach token if available
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("authToken");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+
   return config;
 });
 

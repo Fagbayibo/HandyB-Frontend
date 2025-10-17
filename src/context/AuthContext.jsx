@@ -1,27 +1,39 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { loginRequest, signupRequest } from "../services/authApi.js";
+import { getMe, loginRequest, signupRequest } from "../services/authApi.js";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false); 
-  const [initializing, setInitializing] = useState(true); 
+  const [loading, setLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      setUser({ token });
-    }
-    setInitializing(false); 
+    const fetchUser = async () => {
+      try {
+        const res = await getMe();
+        if (res?.success) {
+          setUser(res.User);
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        console.log("Session Restored Failed", err);
+        setUser(null);
+      } finally {
+        setInitializing(false);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   // Login function
   const login = async (credentials) => {
     setLoading(true);
     try {
-      const data = await loginRequest(credentials); 
-      localStorage.setItem("authToken", data.token); 
-      setUser(data); 
+      const data = await loginRequest(credentials);
+      localStorage.setItem("authToken", data.token);
+      setUser(data);
       return data;
     } finally {
       setLoading(false);
@@ -41,8 +53,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-
-  
   // Logout function
   const logout = () => {
     setUser(null);
@@ -51,7 +61,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, initializing, login, signup, logout }}
+      value={{ user, loading, initializing, login, signup, logout, setUser }}
     >
       {children}
     </AuthContext.Provider>

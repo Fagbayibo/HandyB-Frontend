@@ -4,19 +4,23 @@ import { useRef, useState } from "react";
 import { TbRefresh } from "react-icons/tb";
 import { BiLogoGmail } from "react-icons/bi";
 import { FaPhoneAlt } from "react-icons/fa";
-import { useLocation } from "react-router";
-
+import { useLocation, useNavigate } from "react-router";
+import { emailOtpRequest } from "../services/authApi";
+import { useAuth } from "../context/AuthContext";
 
 const EmailOtpPage = () => {
-  const location = useLocation()
-  const email = location.state?.email
-  const [otp, setOtp] = useState(["", "", "", "", ""]);
+  const location = useLocation();
+  const email = location.state?.email;
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputsRef = useRef([]);
   const [isValid, setIsValid] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const {setUser} =  useAuth()
 
-  const correctOtp = ["1", "2", "3", "4", "5"];
+  // const correctOtp = ["1", "2", "3", "4", "5"];
 
-  const handleChange = (element, index) => {
+  const handleChange = async (element, index) => {
     if (index > 0 && otp[index - 1] === "") return;
     if (!/^\d*$/.test(element.value.trim())) return;
 
@@ -29,9 +33,33 @@ const EmailOtpPage = () => {
     }
 
     if (newOtp.every((val) => val !== "")) {
-      const correct = newOtp.join("") === correctOtp.join("");
-      setIsValid(correct);
-      if (correct) console.log("OTP Verified ✅");
+      const enteredOtp = newOtp.join("");
+      setIsLoading(true);
+
+      const otpPayload = {
+        email: email,
+        otp: enteredOtp,
+      };
+
+      try {
+        const response = await emailOtpRequest(otpPayload);
+        console.log(response)
+        if (response.success) {
+          setIsValid(true);
+          setUser(response.user)
+          console.log("✅ OTP Verified Successfully");
+          setTimeout(() => {
+            navigate("/verify");
+          }, 1000);
+        } else {
+          setIsValid(false), console.log("Invalid OTP");
+        }
+      } catch (error) {
+        console.error("Error verifying OTP:", error);
+        setIsValid(false);
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       setIsValid(null);
     }
@@ -71,9 +99,10 @@ const EmailOtpPage = () => {
           <p className="font-semibold text-2xl tracking-tight md:text-2xl">
             Confirmation OTP Sent!
           </p>
-          <p className="md:max-lg:text-blue-500 tracking-tight text-[14px] md:text-[18px] text-gray-700">
-            We’ve sent a <span className="font-semibold">Verification OTP</span> to{" "}
-            <span className="font-semibold">{email}</span>. Please check your inbox and fill the boxes to confirm your account.
+          <p className="md:max-lg:text-gray-700 tracking-tight text-[14px] md:text-[18px] text-gray-700">
+            We’ve sent a <span className="font-semibold">Verification OTP</span>{" "}
+            to <span className="font-semibold">{email}</span>. Please check your
+            inbox and fill the boxes to confirm your account.
           </p>
         </div>
 
@@ -111,14 +140,16 @@ const EmailOtpPage = () => {
             <TbRefresh size={25} /> Resend OTP
           </button>
           <button className="flex items-center gap-2 text-[16px] font-medium underline hover:text-brand transition">
-            <FaPhoneAlt size={20}/> Send via Phone
+            <FaPhoneAlt size={20} /> Send via Phone
           </button>
         </div>
 
         {/* Experience Problem */}
         <div className="text-center mt-12 mb-4 text-sm text-gray-400">
           Experiencing email problems?{" "}
-          <span className="underline font-semibold text-black cursor-pointer">Contact Us</span>
+          <span className="underline font-semibold text-black cursor-pointer">
+            Contact Us
+          </span>
         </div>
       </div>
     </div>
