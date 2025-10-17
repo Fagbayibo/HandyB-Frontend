@@ -56,7 +56,7 @@ export default function Notification({
 
   // animation classes
   const base =
-    "fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-md w-full rounded-full shadow-md";
+    "fixed top-5 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-24px)] sm:max-w-xl md:max-w-2xl lg:max-w-3xl rounded-full shadow-md";
   const transition = "transform transition-all duration-300 ease-out";
   const enterFrom = "opacity-0 -translate-y-4 scale-95";
   const enterTo = "opacity-100 translate-y-0 scale-100";
@@ -106,7 +106,9 @@ export default function Notification({
           <p className={`text-md ${text} font-poppins font-medium`}>
             {type === "success" ? "Success" : "Error"}
           </p>
-          <p className="text-sm text-white mt-1 break-words">{message}</p>
+          <p className="text-sm text-white mt-1 whitespace-normal sm:whitespace-nowrap overflow-hidden text-ellipsis">
+            {message}
+          </p>
         </div>
 
         <button

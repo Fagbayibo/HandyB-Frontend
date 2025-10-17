@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { IoMdEyeOff } from "react-icons/io";
 import { IoEye } from "react-icons/io5";
 import { TiWarning } from "react-icons/ti";
@@ -12,6 +12,7 @@ import GoogleIcon from "../assets/images/google.png";
 import { loginSchema } from "../utils/validation";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router";
+import Notification from "../components/Notification";
 
 export default function Login() {
   const [phone, setPhone] = useState("");
@@ -19,22 +20,41 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [notif, setNotif] = useState({ open: false, type: "success", message: "" });
+  const redirectTimer = useRef(null);
+  const redirectDelayMs = 800; // short delay to show success
 
   const isFormValid = phone && password;
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    return () => {
+      if (redirectTimer.current) clearTimeout(redirectTimer.current);
+    };
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = { phone, password };
+
+    const apicredentials = {
+        phoneNumber: phone,
+        password: password
+    }
 
     try {
       await loginSchema.validate(formData, { abortEarly: false });
       setError({});
       setLoading(true);
-      const userData = await login(formData);
-      navigate("/dashboard");
-      console.log("User loggedin: ", userData);
+
+      const response = await login(apicredentials);
+      console.log("User loggedin: ", response);
+      setNotif({ open: true, type: "success", message: "Login successful" });
+      redirectTimer.current = setTimeout(() => {
+        setNotif((s) => ({ ...s, open: false }));
+        navigate("/dashboard");
+      }, redirectDelayMs);
     } catch (err) {
       if (err.inner) {
         const errors = err.inner.reduce((acc, curr) => {
@@ -42,8 +62,10 @@ export default function Login() {
           return acc;
         }, {});
         setError(errors);
+        setNotif({ open: true, type: "error", message: "Please fix the highlighted fields" });
       } else {
-        setError({ general: err.message || "login failed" });
+        setError({ general: err.message || "Login failed. Please try again." });
+        setNotif({ open: true, type: "error", message: err.message || "Login failed. Please try again." });
       }
     } finally {
       setLoading(false);
@@ -61,6 +83,15 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-white font-poppins">
+      <Notification
+        open={notif.open}
+        type={notif.type}
+        message={notif.message}
+        onClose={() => {
+          if (redirectTimer.current) clearTimeout(redirectTimer.current);
+          setNotif((s) => ({ ...s, open: false }));
+        }}
+      />
       {/* Left Section (Form) */}
       <div className="w-full lg:w-1/2 overflow-y-auto p-6 sm:p-10 lg:p-16 flex flex-col items-center mt-6 sm:mt-12 space-y-6">
         <img src={MainLogo} alt="logo" className="w-28 sm:w-36" />

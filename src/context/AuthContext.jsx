@@ -11,8 +11,9 @@ export const AuthProvider = ({ children }) => {
     const fetchUser = async () => {
       try {
         const res = await getMe();
+        console.log(res)
         if (res?.success) {
-          setUser(res.User);
+          setUser(res.user);
         } else {
           setUser(null);
         }
@@ -31,10 +32,11 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     setLoading(true);
     try {
-      const data = await loginRequest(credentials);
-      localStorage.setItem("authToken", data.token);
-      setUser(data);
-      return data;
+      await loginRequest(credentials);
+      const me = await getMe();
+      if(me?.user) setUser(me.user)
+      else  setUser(null)
+      return me;
     } finally {
       setLoading(false);
     }
@@ -44,10 +46,11 @@ export const AuthProvider = ({ children }) => {
   const signup = async (payload) => {
     setLoading(true);
     try {
-      const data = await signupRequest(payload);
-      localStorage.setItem("authToken", data.token);
-      setUser(data);
-      return data;
+      await signupRequest(payload);
+      const me = await getMe();
+      if(me?.user) setUser(me.user);
+      else  setUser(null)
+      return me
     } finally {
       setLoading(false);
     }
